@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Easy.PNG">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Medium.PNG">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="postapocalypse3.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Attack1.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Dead1.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Hurt1.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Dead2.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Hurt2.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Attack2.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Walk2.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Idle2.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Walk1.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Idle1.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Deadz.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Attack.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Attackz.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Walk.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Walkz.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Idlez.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Jump.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Dead.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Hurt.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Shot.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Run.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Idle.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="postapocalypse4.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="postapocalypse2.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="postapocalypse1.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Victory.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="GameOver.png">
+      <Filter>Resource</Filter>
+    </Image>
+    <Image Include="Hard.PNG">
+      <Filter>Resource</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

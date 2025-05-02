@@ -1,0 +1,16 @@
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vcxproj.user
+*.VC.db
+*.obj
+*.log
+*.ipch
+*.pch
+*.exe
+*.dll
+*.pdb
+*.idb
+*.opendb
