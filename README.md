@@ -13,6 +13,8 @@ Boss-ul este un inamic mult mai puternic decât zombie-ul și se află într-o s
 Când boss-ul este învins, trece în starea Dead, iar animația sa reflectă acest lucru, cu o schimbare a comportamentului și a aspectului.
 Jocul include un sistem de dificultate care permite jucătorilor să aleagă cum vor să se joace. La început, jucătorul poate selecta una dintre opțiunile de dificultate: Ușor, Medie sau Greu. Fiecare nivel de dificultate influențează comportamentele inamicilor, viteza lor, forța atacurilor și capacitatea de a se recupera după un atac. De exemplu, pe nivelul Greu, zombie-urile și boss-ul sunt mai rapide, mai agresive și au mai multă viață, în timp ce pe nivelul Ușor, aceștia sunt mai lent și suferă daune mai mari.
 Combatul se bazează pe o serie de atacuri pe care jucătorul le poate efectua pentru a înfrunta inamicii. Atacurile sunt realizate prin animații care schimbă aspectul și comportamentul personajului principal. Jucătorul trebuie să învețe când să atace, când să evite și când să apere pentru a supraviețui. De asemenea, jucătorul trebuie să își gestioneze viața și resursele, deoarece un singur hit poate fi fatal într-o luptă cu un boss sau cu un grup de zombie.
+
+
 Jocul contine:
 	-fisiere separate pentru clase (.h si .cpp)
 	-nu contine using namespace std
