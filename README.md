@@ -1,3 +1,5 @@
+Daca la rularea codului exista erori, se va rula DOAR Source.cpp, ce conține codul din toate celelalte fișiere .h și .cpp
+
 Byte & Fight – descriere
 Jocul în cauză se bazează pe un sistem de luptă în timp real, în care jucătorul controlează un personaj principal (player-ul) și interacționează cu o serie de inamici, fiecare cu propriile sale abilități și comportamente. Personajul principal se află într-o lume virtuală, în care trebuie să depășească obstacole, să înfrunte inamici și să adune puncte de progres. În plus, jucătorul poate alege dificultatea jocului, ceea ce influențează atât forța inamicilor, cât și dinamica generală a jocului.
 1. Player-ul (personajul principal)
