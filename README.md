@@ -23,3 +23,8 @@ Jocul contine:
 	-Zombie este o clasa cu atribute de tip pointer
 	-functii 
 	-STL
+	-3 cazuri de exceptie:
+ 		-caz pentru imagine invalida din meniul principal
+   		-caz pentru atac (in cazul in care atacul este invalid)
+     		-caz pentru miscare (daca iese din boundaries)
+       
