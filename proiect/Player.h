@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #ifndef PLAYER_H
 #define PLAYER_H
 
@@ -36,3 +36,4 @@ private:
 };
 
 #endif // PLAYER_H
+*/

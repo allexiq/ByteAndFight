@@ -1,4 +1,4 @@
-#include <SFML/Graphics.hpp>
+/*#include <SFML/Graphics.hpp>
 #include "Player.h"
 #include "Boss.h"
 #include "Zombie.h"
@@ -50,4 +50,4 @@ int main() {
 
     delete zombie;
     return 0;
-}
+}*/

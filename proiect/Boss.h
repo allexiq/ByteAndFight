@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #ifndef BOSS_H
 #define BOSS_H
 
@@ -38,3 +38,4 @@ private:
 };
 
 #endif // BOSS_H
+*/

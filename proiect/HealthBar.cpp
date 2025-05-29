@@ -1,4 +1,4 @@
-#include "HealthBar.h"
+/*#include "HealthBar.h"
 
 void drawHealthBar(sf::RenderWindow& window, Entity& entity, float x, float y, sf::Font& font) {
     const float width = 600.f;
@@ -25,4 +25,4 @@ void drawHealthBar(sf::RenderWindow& window, Entity& entity, float x, float y, s
     healthBar.setFillColor(barColor);
     healthBar.setPosition(x, y);
     window.draw(healthBar);
-}
+}*/

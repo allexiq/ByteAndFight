@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #ifndef ENTITY_H
 #define ENTITY_H
 
@@ -33,3 +33,4 @@ protected:
 };
 
 #endif // ENTITY_H
+*/

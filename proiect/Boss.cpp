@@ -1,4 +1,4 @@
-#include "Boss.h"
+/*#include "Boss.h"
 
 Boss::Boss(std::map<BossState, Animation*>& animations)
     : Entity(6.f), animations(animations), state(BossState::Idle)
@@ -114,4 +114,4 @@ void Boss::setState(BossState newState) {
 
 void Boss::setDead() {
     setState(BossState::Dead);
-}
+}*/

@@ -1,4 +1,4 @@
-#include "Player.h"
+/*#include "Player.h"
 
 Player::Player(std::map<PlayerState, Animation*>& animations)
     : Entity(5.f), animations(animations), state(PlayerState::Idle)
@@ -116,4 +116,4 @@ void Player::setState(PlayerState newState) {
 
 void Player::setDead() {
     setState(PlayerState::Dead);
-}
+}*/

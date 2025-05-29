@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #ifndef GAME_FUNCTIONS_H
 #define GAME_FUNCTIONS_H
 
@@ -29,3 +29,4 @@ void gameLoop(sf::RenderWindow& window, Player& player, Boss& boss, Zombie* zomb
     float GROUND_Y, sf::Font& font, sf::Texture& bgEasy, sf::Texture& bgMedium, sf::Texture& bgHard);
 
 #endif // GAME_FUNCTIONS_H
+*/

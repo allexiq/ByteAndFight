@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #ifndef DIFFICULTY_H
 #define DIFFICULTY_H
 
@@ -8,4 +8,4 @@ enum class Difficulty {
     Hard
 };
 
-#endif // DIFFICULTY_H
+#endif // DIFFICULTY_H */

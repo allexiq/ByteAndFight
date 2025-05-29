@@ -1,4 +1,4 @@
-﻿#include "Entity.h"
+﻿/*#include "Entity.h"
 
 Entity::Entity(float scaleFactor)
     : health(100), alive(true), facingRight(true), velocityY(0), onGround(false), attacking(false),
@@ -34,3 +34,4 @@ void Entity::updateInvulnerability(float dt) {
         }
     }
 }
+*/

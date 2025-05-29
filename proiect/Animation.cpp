@@ -1,4 +1,4 @@
-#include "Animation.h"
+/*#include "Animation.h"
 
 Animation::Animation(sf::Texture& texture, int frameCount, float frameTime, sf::Vector2i frameSize, bool looping)
     : texture(texture), frameCount(frameCount), frameTime(frameTime), frameSize(frameSize), looping(looping)
@@ -54,4 +54,4 @@ void Animation::updateFrame() {
         frameSize.x * currentFrame, 0,
         frameSize.x, frameSize.y
     ));
-}
+}*/

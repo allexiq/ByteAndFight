@@ -1,4 +1,4 @@
-#include "Zombie.h"
+/*#include "Zombie.h"
 
 Zombie::Zombie(const std::map<ZombieState, Animation*>& anims)
     : Entity(4.f), animations(anims), currentState(ZombieState::Idle), attackCooldown(2.f), attackTimer(0.f)
@@ -89,3 +89,4 @@ void Zombie::move(float dx, float dy) {
 void Zombie::setDead() {
     currentState = ZombieState::Dead;
 }
+*/

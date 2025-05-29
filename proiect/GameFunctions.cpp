@@ -1,4 +1,4 @@
-#include "GameFunctions.h"
+/*#include "GameFunctions.h"
 #include "Difficulty.h"
 void initializeTextures(sf::Texture& menuBgTex, sf::Texture& bgEasy, sf::Texture& bgMedium, sf::Texture& bgHard,
     sf::Texture& easyTex, sf::Texture& mediumTex, sf::Texture& hardTex) {
@@ -183,4 +183,4 @@ void gameLoop(sf::RenderWindow& window, Player& player, Boss& boss, Zombie* zomb
 
         window.display();
     }
-}
+}*/

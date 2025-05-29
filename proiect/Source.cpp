@@ -10,32 +10,115 @@ enum class PlayerState { Idle, Run, Jump, Attack, Hurt, Dead };
 enum class BossState { Idle, Walk, Attack, Hurt, Dead };
 enum class Difficulty { Easy, Medium, Hard };
 enum class ZombieState { Idle, Walk, Attack, Dead };
+class Observer {
+public:
+    virtual void onNotify(int health) = 0;
+    virtual ~Observer() = default;
+};
+class Subject {
+public:
+    void addObserver(Observer* obs) {
+        observers.push_back(obs);
+    }
 
+    void onNotify(int newHealth) {
+        for (auto obs : observers) {
+            obs->onNotify(newHealth);
+        }
+    }
+
+private:
+    std::vector<Observer*> observers;
+};
+template <typename T>           // asta e pt Player 
+void updateEntity(T& entity, float groundY, float dt) {
+    entity.update(groundY, dt);
+}
+
+template<typename T>            // pt Boss si Zombie
+void updateEntity(T& entity, float groundY, float dt, sf::Vector2f targetPos) {
+    entity.update(groundY, dt, targetPos);
+}
+
+class FileException : public std::exception
+{
+public:
+    const char* what() const noexcept override
+    {
+        return "Coultn't load file!";
+    }
+};
+
+class MovementException : public std::exception
+{
+public:
+    const char* what() const noexcept override
+    {
+        return "Entity is outside the boundaries!";
+    }
+};
+
+class AttackException : public std::exception
+{
+public:
+    const char* what() const noexcept override
+    {
+        return "Invalid attack!";
+    }
+};
+class ResourceManager {
+public:
+    static ResourceManager& getInstance() {
+        static ResourceManager instance;
+        return instance;
+    }
+
+    sf::Texture& getTexture(const std::string& filename) {
+        if (textures.find(filename) == textures.end()) {
+            sf::Texture tex;
+            if (!tex.loadFromFile(filename)) {
+                throw std::runtime_error("Could not load texture: " + filename);
+            }
+            textures[filename] = std::move(tex);
+        }
+        return textures[filename];
+    }
+private:
+    std::map<std::string, sf::Texture> textures;
+
+    ResourceManager() {}
+    ResourceManager(const ResourceManager&) = delete;
+    void operator=(const ResourceManager&) = delete;
+};
+
+class HealthUI : public Observer {
+public:
+    void onNotify(int health) override {
+        std::cout << "Player health updated: " << health << "\n";
+    }
+};
+
+template<typename T>
 class Animation {
 public:
-    Animation(sf::Texture& texture, int frameCount, float frameTime, sf::Vector2i frameSize, bool looping = true)
+    Animation(sf::Texture& texture, int frameCount, T frameTime, sf::Vector2i frameSize, bool looping = true)
         : texture(texture), frameCount(frameCount), frameTime(frameTime), frameSize(frameSize), looping(looping)
     {
         currentFrame = 0;
-        elapsed = 0.f;
+        elapsed = 0;
         sprite.setTexture(texture);
         sprite.setOrigin(frameSize.x / 2.f, frameSize.y / 18.f);
         updateFrame();
     }
 
-    void update(float dt) {
+    void update(T dt) {
         if (!looping && currentFrame == frameCount - 1) return;
 
         elapsed += dt;
         if (elapsed >= frameTime) {
-            elapsed = 0.f;
-            if (looping) {
-                currentFrame = (currentFrame + 1) % frameCount;
-            }
-            else {
-                if (currentFrame < frameCount - 1)
-                    currentFrame++;
-            }
+            elapsed = 0;
+            currentFrame = looping ? (currentFrame + 1) % frameCount
+                : std::min(currentFrame + 1, frameCount - 1);
             updateFrame();
         }
     }
@@ -67,8 +150,8 @@ private:
     sf::Sprite sprite;
     int frameCount;
     int currentFrame;
-    float frameTime;
-    float elapsed;
+    T frameTime;
+    T elapsed;
     bool looping;
     sf::Vector2i frameSize;
 
@@ -94,7 +177,7 @@ public:
 
     bool isAlive() const { return alive; }
     int getHealth() const { return health; }
-    void takeDamage(int dmg) {
+    virtual void takeDamage(int dmg) {
         if (alive && !invulnerable) {
             health -= dmg;
             invulnerable = true; // Entity devine invulnerabil cand ia damage
@@ -106,7 +189,7 @@ public:
             }
         }
     }
-
+    virtual ~Entity() = default;
     void updateInvulnerability(float dt) {
         if (invulnerable) {
             invulTimer -= dt;
@@ -132,16 +215,36 @@ protected:
     virtual void setDead() = 0;
 };
 
-class Player : public Entity {
+class Player : public Entity, public Subject {
 public:
-    Player(std::map<PlayerState, Animation*>& animations)
+    Player(std::map<PlayerState, Animation<float>*>& animations)
         : Entity(5.f), animations(animations), state(PlayerState::Idle)
     {
         currentAnimation = animations[state];
         for (auto& pair : animations)
             pair.second->setScale(scale, scale);
     }
+    void move(float dx, float dy, const sf::RenderWindow& window) {
+        sf::Vector2f newPos = getPosition() + sf::Vector2f(dx, dy);
+        sf::Vector2u windowSize = window.getSize();
 
+        if (newPos.x < 0 || newPos.x > windowSize.x ||
+            newPos.y < 0 || newPos.y > windowSize.y) {
+            throw MovementException();
+        }
+
+        setPosition(newPos.x, newPos.y);
+    }
+
+    void attack() {
+        if (!alive || !onGround) {
+            throw AttackException();
+        }
+
+        state = PlayerState::Attack;
+        attacking = true;
+        attackTimer = 0.f;
+    }
     void setPosition(float x, float y) {
         for (auto& pair : animations) {
             pair.second->setPosition(x, y);
@@ -221,6 +324,8 @@ public:
         currentAnimation->update(dt);
 
         updateInvulnerability(dt); // Update status invulnerabilitate
+
+        
     }
     bool isAttacking() const { return attacking; }
 
@@ -234,12 +339,17 @@ public:
     void drawTo(sf::RenderWindow& window) override {
         window.draw(currentAnimation->getSprite());
     }
-
+    void takeDamage(int dmg) override {
+        if (alive && !invulnerable) {
+            Entity::takeDamage(dmg);   
+            onNotify(health);         // trimite update catre observeri (ex. HealthUI)
+        }
+    }
 private:
-    std::map<PlayerState, Animation*>& animations;
-    Animation* currentAnimation;
+    std::map<PlayerState, Animation<float>*>& animations;
+    Animation<float>* currentAnimation;
     PlayerState state;
-
+    int health;
     bool left = false, right = false;
     bool hasHitDuringAttack = false;
     const float gravity = 0.5f;
@@ -265,7 +375,7 @@ private:
 
 class Boss : public Entity {
 public:
-    Boss(std::map<BossState, Animation*>& animations)
+    Boss(std::map<BossState, Animation<float>*>& animations)
         : Entity(6.f), animations(animations), state(BossState::Idle)
     {
         currentAnimation = animations[state];
@@ -356,8 +466,8 @@ public:
     }
 
 private:
-    std::map<BossState, Animation*>& animations;
-    Animation* currentAnimation;
+    std::map<BossState, Animation<float>*>& animations;
+    Animation<float>* currentAnimation;
     BossState state;
 
     const float moveSpeed = 1.5f;
@@ -383,7 +493,7 @@ private:
 };
 class Zombie : public Entity {
 public:
-    Zombie(const std::map<ZombieState, Animation*> anims)
+    Zombie(const std::map<ZombieState, Animation<float>*> anims)
         : Entity(4.f), animations(anims), currentState(ZombieState::Idle)
     {
         currentAnim = animations[currentState];
@@ -466,8 +576,8 @@ public:
     bool isAttacking() const { return attacking; }
 
 private:
-    std::map<ZombieState, Animation*> animations;
-    Animation* currentAnim;
+    std::map<ZombieState, Animation<float>*> animations;
+    Animation<float>* currentAnim;
     ZombieState currentState;
     float attackCooldown;
 
@@ -522,26 +632,20 @@ int main() {
 
     const float GROUND_Y = 920.f;
 
-    sf::Texture idleTex, runTex, jumpTex, attackTex, hurtTex, deadTex;
-    sf::Texture bossIdleTex, bossWalkTex, bossAttackTex, bossHurtTex, bossDeadTex;
-    sf::Texture bgTex, menuTex, easyTex, mediumTex, hardTex;
+   
     sf::Font font;
    
-    sf::Texture menuBgTex, gameBgTex;
-    menuBgTex.loadFromFile("postapocalypse3.png");
-    //gameBgTex.loadFromFile("postapocalypse4.png");
+   
+    sf::Texture& menuBgTex = ResourceManager::getInstance().getTexture("postapocalypse3.png");
     sf::Sprite menuBackground(menuBgTex);
     //sf::Sprite gameBackground(gameBgTex);
     
-
-    sf::Texture bgEasy, bgMedium, bgHard;
-    bgEasy.loadFromFile("postapocalypse2.png");
-    bgMedium.loadFromFile("postapocalypse4.png");
-    bgHard.loadFromFile("postapocalypse1.png");
-
-    easyTex.loadFromFile("Easy.png");
-    mediumTex.loadFromFile("Medium.png");
-    hardTex.loadFromFile("Hard.png");
+    sf::Texture& bgEasy = ResourceManager::getInstance().getTexture("postapocalypse2.png");
+    sf::Texture& bgMedium = ResourceManager::getInstance().getTexture("postapocalypse4.png");
+    sf::Texture& bgHard = ResourceManager::getInstance().getTexture("postapocalypse1.png");
+    sf::Texture& easyTex = ResourceManager::getInstance().getTexture("Easy.png");
+    sf::Texture& mediumTex = ResourceManager::getInstance().getTexture("Medium.png");
+    sf::Texture& hardTex = ResourceManager::getInstance().getTexture("Hard.png");
 
     sf::Sprite easySprite(easyTex), mediumSprite(mediumTex), hardSprite(hardTex);
     
@@ -549,18 +653,17 @@ int main() {
     easySprite.setPosition(600.f, 200.f);
     mediumSprite.setPosition(600.f, 400.f);
     hardSprite.setPosition(600.f, 600.f);
-    sf::Texture idleZTex, walkZTex, attackZTex, deadZTex;
-    idleZTex.loadFromFile("Idlez.png");
-    walkZTex.loadFromFile("Walkz.png");
-    attackZTex.loadFromFile("Attackz.png");
-    deadZTex.loadFromFile("Deadz.png");
+    sf::Texture& idleZTex = ResourceManager::getInstance().getTexture("IdleZ.png");
+    sf::Texture& walkZTex = ResourceManager::getInstance().getTexture("Walkz.png");
+    sf::Texture& attackZTex = ResourceManager::getInstance().getTexture("Attackz.png");
+    sf::Texture& deadZTex = ResourceManager::getInstance().getTexture("Deadz.png");
+   
+    Animation<float> idleZ(idleZTex, 7, 0.2f, { 128, 128 });
+    Animation<float> walkZ(walkZTex, 12, 0.15f, { 128, 128 });
+    Animation<float> attackZ(attackZTex, 10, 0.1f, { 128, 128 });
+    Animation<float> deadZ(deadZTex, 5, 0.15f, { 128, 128 }, false);
 
-    Animation idleZ(idleZTex, 7, 0.2f, { 128, 128 });
-    Animation walkZ(walkZTex, 12, 0.15f, { 128, 128 });
-    Animation attackZ(attackZTex, 10, 0.1f, { 128, 128 });
-    Animation deadZ(deadZTex, 5, 0.15f, { 128, 128 }, false);
-
-    std::map<ZombieState, Animation*> zombieAnims = {
+    std::map<ZombieState, Animation<float>*> zombieAnims = {
         { ZombieState::Idle, &idleZ },
         { ZombieState::Walk, &walkZ },
         { ZombieState::Attack, &attackZ },
@@ -568,38 +671,34 @@ int main() {
     };
 
     sf::Sprite background;
-
-    hurtTex.loadFromFile("Hurt.png");
-    idleTex.loadFromFile("Idle.png");
-    runTex.loadFromFile("Run.png");
-    jumpTex.loadFromFile("Jump.png");
-    attackTex.loadFromFile("Shot.png");
-    deadTex.loadFromFile("Dead.png");
-    bossIdleTex.loadFromFile("Idle1.png");
-    bossWalkTex.loadFromFile("Walk1.png");
-    bossAttackTex.loadFromFile("Attack1.png");
-    bossHurtTex.loadFromFile("Hurt1.png");
-    bossDeadTex.loadFromFile("Dead1.png");
-    //bgTex.loadFromFile("postapocalypse4.png");
-    menuTex.loadFromFile("postapocalypse3.png");
-    
-
+    sf::Texture& hurtTex = ResourceManager::getInstance().getTexture("Hurt.png");
+    sf::Texture& idleTex = ResourceManager::getInstance().getTexture("Idle.png");
+    sf::Texture& runTex = ResourceManager::getInstance().getTexture("Run.png");
+    sf::Texture& jumpTex = ResourceManager::getInstance().getTexture("Jump.png");
+    sf::Texture& attackTex = ResourceManager::getInstance().getTexture("Shot.png");
+    sf::Texture& deadTex = ResourceManager::getInstance().getTexture("Dead.png");
+    sf::Texture& bossIdleTex = ResourceManager::getInstance().getTexture("Idle1.png");
+    sf::Texture& bossWalkTex = ResourceManager::getInstance().getTexture("Walk1.png");
+    sf::Texture& bossHurtTex = ResourceManager::getInstance().getTexture("Hurt1.png");
+    sf::Texture& bossDeadTex = ResourceManager::getInstance().getTexture("Dead1.png");
+    sf::Texture& menuTex = ResourceManager::getInstance().getTexture("postapocalypse3.png");
+    sf::Texture& bossAttackTex = ResourceManager::getInstance().getTexture("Attack1.png");
 
     // Animatii
-    Animation hurtAnim(hurtTex, 2, 0.1f, { 128, 128 });
-    Animation idleAnim(idleTex, 6, 0.15f, { 128, 128 });
-    Animation runAnim(runTex, 8, 0.1f, { 128, 128 });
-    Animation jumpAnim(jumpTex, 11, 0.08f, { 128, 128 });
-    Animation attackAnim(attackTex, 12, 0.05f, { 128, 128 });
-    Animation deadAnim(deadTex, 4, 0.1f, { 128, 128 }, false);
+    Animation<float> hurtAnim(hurtTex, 2, 0.1f, { 128, 128 });
+    Animation<float> idleAnim(idleTex, 6, 0.15f, { 128, 128 });
+    Animation<float> runAnim(runTex, 8, 0.1f, { 128, 128 });
+    Animation<float> jumpAnim(jumpTex, 11, 0.08f, { 128, 128 });
+    Animation<float> attackAnim(attackTex, 12, 0.05f, { 128, 128 });
+    Animation<float> deadAnim(deadTex, 4, 0.1f, { 128, 128 }, false);
 
-    Animation bossIdle(bossIdleTex, 10, 0.15f, { 128, 128 });
-    Animation bossWalk(bossWalkTex, 12, 0.12f, { 128, 128 });
-    Animation bossAttack(bossAttackTex, 5, 0.1f, { 128, 128 });
-    Animation bossHurt(bossHurtTex, 3, 0.1f, { 128, 128 });
-    Animation bossDead(bossDeadTex, 5, 0.1f, { 128, 128 }, false);
+    Animation<float> bossIdle(bossIdleTex, 10, 0.15f, { 128, 128 });
+    Animation<float> bossWalk(bossWalkTex, 12, 0.12f, { 128, 128 });
+    Animation<float> bossAttack(bossAttackTex, 5, 0.1f, { 128, 128 });
+    Animation<float> bossHurt(bossHurtTex, 3, 0.1f, { 128, 128 });
+    Animation<float> bossDead(bossDeadTex, 5, 0.1f, { 128, 128 }, false);
 
-    std::map<PlayerState, Animation*> playerAnims = {
+    std::map<PlayerState, Animation<float>*> playerAnims = {
         { PlayerState::Idle, &idleAnim },
         { PlayerState::Run, &runAnim },
         { PlayerState::Jump, &jumpAnim },
@@ -608,13 +707,26 @@ int main() {
         { PlayerState::Dead, &deadAnim}
     };
 
-    std::map<BossState, Animation*> bossAnims = {
+    std::map<BossState, Animation<float>*> bossAnims = {
         { BossState::Idle, &bossIdle },
         { BossState::Walk, &bossWalk },
         { BossState::Attack, &bossAttack },
         { BossState::Hurt, &bossHurt },
         { BossState::Dead, &bossDead }
     };
+
+    try
+    {
+        if (!menuTex.loadFromFile("postapocalypse3.png"))
+        {
+            throw FileException();
+        }
+    }
+    catch (const FileException& e)
+    {
+        std::cerr << e.what() << std::endl;
+        exit(EXIT_FAILURE);
+    }
 
     int bossHealth = 50; // default pt easy
     float enemySpeed = 1.f;
@@ -665,6 +777,8 @@ int main() {
     }
     
     Player player(playerAnims);
+    HealthUI healthDisplay;
+    player.addObserver(&healthDisplay);
     player.setPosition(300.f, GROUND_Y - 128.f * 5.f);
 
     Boss boss(bossAnims);
@@ -679,28 +793,52 @@ int main() {
     while (window.isOpen()) {
         float dt = clock.restart().asSeconds();
         sf::Event event;
+
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-            if (event.type == sf::Event::KeyPressed)
-                player.processEvents(event.key.code, true);
-            if (event.type == sf::Event::KeyReleased)
-                player.processEvents(event.key.code, false);
+            try {
+                if (event.type == sf::Event::KeyPressed)
+                    player.processEvents(event.key.code, true);
+                if (event.type == sf::Event::KeyReleased)
+                    player.processEvents(event.key.code, false);
+            }
+            catch (const AttackException& e) {
+                std::cerr << "[Attack Error] " << e.what() << std::endl;
+            }
         }
 
-        player.update(GROUND_Y, dt);
-        sf::Vector2f pos = player.getPosition();
-        sf::FloatRect bounds = player.getBounds();
-        if (pos.x < 100.f)
-            player.setPosition(100.f, pos.y);
-        if (pos.x + bounds.width > 2500)
-            player.setPosition(2500 - bounds.width, pos.y);
-        if (pos.y + bounds.height > GROUND_Y)
-            player.setPosition(pos.x, GROUND_Y - bounds.height);
-        boss.update(GROUND_Y, dt, player.isAlive() ? player.getPosition() : sf::Vector2f(0.f, 0.f));
+        try {
+            updateEntity(player, GROUND_Y, dt);
+
+            sf::Vector2f pos = player.getPosition();
+            sf::FloatRect bounds = player.getBounds();
+
+            if (pos.x < 100.f)
+                throw MovementException();
+            if (pos.x + bounds.width > 2500)
+                throw MovementException();
+            if (pos.y + bounds.height > GROUND_Y)
+                throw MovementException();
+
+        }
+        catch (const MovementException& e) {
+            std::cerr << "[Movement Error] " << e.what() << std::endl;
+            sf::Vector2f pos = player.getPosition();
+            sf::FloatRect bounds = player.getBounds();
+            if (pos.x < 100.f)
+                player.setPosition(100.f, pos.y);
+            else if (pos.x + bounds.width > 2500)
+                player.setPosition(2500 - bounds.width, pos.y);
+            else if (pos.y + bounds.height > GROUND_Y)
+                player.setPosition(pos.x, GROUND_Y - bounds.height);
+        }
+
+
+        updateEntity(boss, GROUND_Y, dt, player.getPosition());
 
         if (zombie && zombie->isAlive()) {
-            zombie->update(GROUND_Y, dt, player.getPosition());
+            updateEntity(*zombie, GROUND_Y, dt, player.getPosition());
             if (zombie->isAttacking() && zombie->getBounds().intersects(player.getBounds()))
                 player.takeDamage(30);
                 player.hurt();
@@ -721,7 +859,7 @@ int main() {
                 boss.hurt();
             }
             if (zombie->isAlive() && player.isAttacking() && zombie->getBounds().intersects(zombie->getBounds())) {
-                zombie->takeDamage(1);   // Boss pierde 10 HP
+                zombie->takeDamage(1);   // Zombie pierde viata
                 
             }
         }
@@ -759,3 +897,4 @@ int main() {
     
     return 0;
 }
+

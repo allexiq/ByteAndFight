@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #ifndef ANIMATION_H
 #define ANIMATION_H
 
@@ -29,3 +29,4 @@ private:
 };
 
 #endif // ANIMATION_H#pragma once
+*/
