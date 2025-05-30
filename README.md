@@ -27,4 +27,9 @@ Jocul contine:
  		-caz pentru imagine invalida din meniul principal
    		-caz pentru atac (in cazul in care atacul este invalid)
      		-caz pentru miscare (daca iese din boundaries)
-       
+       -o clasa template si o functie template:
+       		-am trensformat clasa Animation in clasa template
+	 	-functie template pentru entitati
+   	-design-patterns:
+    		-Singleton pentru texturi si imagini
+      		-Observer pentru viata jucatorului: de fiecare data cand este atacat si este lovit, apare in consola procentul de viata ramas
