@@ -16,8 +16,9 @@ Combatul se bazează pe o serie de atacuri pe care jucătorul le poate efectua p
 
 
 Jocul contine:
+
 	-fisiere separate pentru clase (.h si .cpp)
- 
+
 	-nu contine using namespace std
  
 	-clase derivate din clasa de baza Entity: Player, Zombie, Boss
