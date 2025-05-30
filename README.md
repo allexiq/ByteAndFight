@@ -17,19 +17,35 @@ Combatul se bazează pe o serie de atacuri pe care jucătorul le poate efectua p
 
 Jocul contine:
 	-fisiere separate pentru clase (.h si .cpp)
+ 
 	-nu contine using namespace std
+ 
 	-clase derivate din clasa de baza Entity: Player, Zombie, Boss
+ 
 	-functii virtuale
+ 
 	-Zombie este o clasa cu atribute de tip pointer
+ 
 	-functii 
+ 
 	-STL
+ 
 	-3 cazuri de exceptie:
+ 
  		-caz pentru imagine invalida din meniul principal
+   
    		-caz pentru atac (in cazul in care atacul este invalid)
+     
      		-caz pentru miscare (daca iese din boundaries)
+       
        -o clasa template si o functie template:
+       
        		-am trensformat clasa Animation in clasa template
+	 
 	 	-functie template pentru entitati
+   
    	-design-patterns:
+    
     		-Singleton pentru texturi si imagini
+      
       		-Observer pentru viata jucatorului: de fiecare data cand este atacat si este lovit, apare in consola procentul de viata ramas
