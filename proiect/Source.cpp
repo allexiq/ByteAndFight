@@ -341,15 +341,16 @@ public:
     }
     void takeDamage(int dmg) override {
         if (alive && !invulnerable) {
-            Entity::takeDamage(dmg);   
-            onNotify(health);         // trimite update catre observeri (ex. HealthUI)
+            Entity::takeDamage(dmg); 
+            health -= dmg;
+            onNotify(health);         // trimite update catre observeri 
         }
     }
 private:
     std::map<PlayerState, Animation<float>*>& animations;
     Animation<float>* currentAnimation;
     PlayerState state;
-    int health;
+    int health=100;
     bool left = false, right = false;
     bool hasHitDuringAttack = false;
     const float gravity = 0.5f;
@@ -401,6 +402,7 @@ public:
             currentAnimation->update(dt);
             return;
         }
+
         if (playerPos == sf::Vector2f(0.f, 0.f)) {
             setState(BossState::Idle);
             currentAnimation->update(dt);
@@ -411,7 +413,7 @@ public:
             hurtTimer -= dt;
             if (hurtTimer <= 0.f) {
                 isHurt = false;
-                setState(BossState::Idle); // revine în Idle dupa Hurt
+                setState(BossState::Idle); // revine in Idle dupa Hurt
             }
             currentAnimation->update(dt);
             return; // sta pe loc cat timp e in hurt
